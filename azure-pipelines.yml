@@ -1,0 +1,16 @@
+trigger:
+- main  # triggers on every push to main branch
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+# Step 1: Build Docker image
+- script: |
+    docker build -t myapp:latest .
+  displayName: "Build Docker Image"
+
+# Step 2: Run Docker container
+- script: |
+    docker run --rm myapp:latest
+  displayName: "Run Docker Container"
