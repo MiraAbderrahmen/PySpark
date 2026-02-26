@@ -5,5 +5,3 @@ print("hello world from python ")
 var="this is a string variable"
 print(var)
 print("the length of the string variable is ",len(var))
-
-

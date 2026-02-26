@@ -1,6 +1,8 @@
 {
   "name": "Python Dev Container",
-  "image": "python:3.12-alpine",
+  "build": {
+    "dockerfile": "../Dockerfile"
+  },
   "workspaceFolder": "/app",
   "mounts": ["source=${localWorkspaceFolder},target=/app,type=bind"],
   "postCreateCommand": "pip install -r requirements.txt",

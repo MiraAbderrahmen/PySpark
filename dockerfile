@@ -1,6 +1,22 @@
 FROM python:3.8-slim
-WORKDIR /app
-COPY requirements.txt /app
+
+# Install Java
+RUN apt update && apt install -y openjdk-17-jre-headless curl bash procps
+
+# Set JAVA_HOME
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV PATH=$JAVA_HOME/bin:$PATH
+
+
+# Set working directory
+WORKDIR /pydev
+
+# Copy files relative to workspace root
+COPY requirements.txt .
+COPY sparkjob.py .
+
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
-COPY Introduction.py /app
-CMD ["python", "Introduction.py"]
+
+# Run Spark job
+CMD ["python", "sparkjob.py"]
