@@ -1,26 +1,22 @@
 from pyspark.sql import SparkSession
 
-# 1️⃣ إنشاء SparkSession
+# 1️⃣ Create SparkSession
 spark = SparkSession.builder \
-    .appName("PySpark DAG Example") \
+    .appName("Two Stages Example") \
     .master("local[2]") \
     .getOrCreate()
 
-# 2️⃣ إنشاء RDD مقسم على 2 partitions
-rdd = spark.sparkContext.parallelize([1,2,3,4,5,6], 2)  # 2 partitions
+# 2️⃣ Create RDD with 2 partitions
+rdd = spark.sparkContext.parallelize([("a",1),("b",1),("a",1),("b",1),("c",1),("c",1)], 2)
 
-# 3️⃣ Transformation 1: multiply by 2
-rdd2 = rdd.map(lambda x: x*2)
+# 3️⃣ Narrow transformation (stage 1)
+rdd2 = rdd.map(lambda x: (x[0], x[1]*2))  # multiply values by 2
 
-# 4️⃣ Transformation 2: keep only values > 5
-rdd3 = rdd2.filter(lambda x: x>5)
+# 4️⃣ Wide transformation (stage 2, causes shuffle)
+counts = rdd2.reduceByKey(lambda a,b: a+b)
 
-# 5️⃣ شوف DAG / execution plan (logical + physical plan)
-print("=== DAG / Execution Plan ===")
-print(rdd3.toDebugString().decode('utf-8'))  # هنا بنشوف ال DAG بتاعنا
-# 6️⃣ Action: collect results
-print("=== Result ===")
-print(rdd3.collect())  # هنا Driver يجمع النتائج من executors
+# 5️⃣ Action
+print(counts.collect())
 
-# 7️⃣ إغلاق SparkSession
+# 6️⃣ Stop SparkSession
 spark.stop()

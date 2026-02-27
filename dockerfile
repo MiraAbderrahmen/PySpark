@@ -19,4 +19,4 @@ COPY sparkjob.py .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Run Spark job
-CMD ["python", "sparkjob.py"]
+CMD ["sleep", "infinity"]
