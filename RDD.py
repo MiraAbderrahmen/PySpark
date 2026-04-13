@@ -7,7 +7,7 @@ spark = SparkSession.builder \
     .getOrCreate()
 
 # 2️⃣ Create RDD with 2 partitions
-rdd = spark.sparkContext.parallelize([("a",1),("b",1),("a",1),("b",1),("c",1),("c",1)], 2)
+rdd = spark.sparkContext.parallelize([("a",1),("b",1),("a",1),("b",1),("c",1),("c",1)])
 
 # 3️⃣ Narrow transformation (stage 1)
 rdd2 = rdd.map(lambda x: (x[0], x[1]*2))  # multiply values by 2
