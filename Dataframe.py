@@ -1,20 +1,45 @@
+from unittest import result
+
 from pyspark.sql import SparkSession
+import inspect
+import time
 
-# Create a SparkSession
-spark = SparkSession.builder.appName("DataFrame Example").getOrCreate()
+spark = SparkSession.builder \
+    .appName("BasicPySparkApp") \
+    .master("local[*]") \
+    .getOrCreate()
 
-# Create a DataFrame from a list of tuples
-data = [(1, "Alice", 30), (2, "Bob", 25), (3, "Charlie", 35)]
-columns = ["ID", "Name", "Age"]
+data = [
+    ("Alice", 34),
+    ("Bob", 45),
+    ("Charlie", 29),
+    ("Diana", 40)
+]
+
+columns = ["name", "age"]
+
+
+#print(inspect.getsource(spark.createDataFrame))
+
 df = spark.createDataFrame(data, columns)
+df.filter(df.age > 30).show()  # 🔥 ACTION → triggers Spark job
 
-df.createOrReplaceTempView("people")
-
-
-result=spark.sql("SELECT * FROM people WHERE Age > 30")
-
-df_filtered=df.filter(df.Age > 30)
-# Show the DataFrame
+print("Initial DataFrame:")
 df.show()
-df_filtered.show()
-result.show()
+df.collect()  # 🔥 ACTION → creates Spark job
+print("DataFrame schema:")
+# Filter
+df_filtered = df.filter(df.age > 30)
+df_filtered.show()  # 🔥 ACTION → another job
+
+# GroupBy aggregation (shuffle happens here)
+avg_age = df.groupBy().avg("age")
+avg_age.show()  # 🔥 ACTION → triggers shuffle stage
+
+result = df.groupBy().avg("age")
+result.explain("formatted")
+
+print("Sleeping so you can open Spark UI...")
+time.sleep(1000)
+
+spark.stop()

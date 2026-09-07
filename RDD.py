@@ -1,3 +1,5 @@
+from time import time
+
 from pyspark.sql import SparkSession
 
 # 1️⃣ Create SparkSession
@@ -19,4 +21,4 @@ counts = rdd2.reduceByKey(lambda a,b: a+b)
 print(counts.collect())
 
 # 6️⃣ Stop SparkSession
-spark.stop()
+time.sleep(1000)  # Sleep to allow time to view Spark UI
