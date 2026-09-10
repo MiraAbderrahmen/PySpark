@@ -1,24 +1,35 @@
-from time import time
+import xml.etree.ElementTree as ET
 
-from pyspark.sql import SparkSession
+r = ET.parse("coverage.cobertura.xml").getroot()
 
-# 1️⃣ Create SparkSession
-spark = SparkSession.builder \
-    .appName("Two Stages Example") \
-    .master("local[2]") \
-    .getOrCreate()
+for pkg in r.iter("package"):
+    if pkg.get("name") != "DwhIngestion.Service":
+        continue
 
-# 2️⃣ Create RDD with 2 partitions
-rdd = spark.sparkContext.parallelize([("a",1),("b",1),("a",1),("b",1),("c",1),("c",1)])
+    total = uncovered = 0
 
-# 3️⃣ Narrow transformation (stage 1)
-rdd2 = rdd.map(lambda x: (x[0], x[1]*2))  # multiply values by 2
+    for c in pkg.findall("classes/class"):
+        for m in c.findall("methods/method"):
+            total += 1
 
-# 4️⃣ Wide transformation (stage 2, causes shuffle)
-counts = rdd2.reduceByKey(lambda a,b: a+b)
+            line_rate = float(m.get("line-rate", 0))
 
-# 5️⃣ Action
-print(counts.collect())
+            if line_rate == 0:
+                uncovered += 1
+                print(
+                    "UNCOVERED  %s :: %s%s"
+                    % (
+                        c.get("name"),
+                        m.get("name"),
+                        m.get("signature", "")
+                    )
+                )
 
-# 6️⃣ Stop SparkSession
-time.sleep(1000)  # Sleep to allow time to view Spark UI
+    covered = total - uncovered
+    method_rate = covered / total if total else 0
+
+    print()
+    print(f"Total methods = {total}")
+    print(f"Covered methods = {covered}")
+    print(f"Uncovered methods = {uncovered}")
+    print(f"Method coverage = {method_rate:.2%}")
