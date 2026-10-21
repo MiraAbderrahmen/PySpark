@@ -1,8 +1,0 @@
-FROM apache/spark:3.5.1-python3
-
-WORKDIR /app
-
-COPY shuffle_exercice.py /app/
-COPY classes /app/classes
-
-RUN mkdir -p /app/data
