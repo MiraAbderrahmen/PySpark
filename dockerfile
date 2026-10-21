@@ -13,10 +13,9 @@ WORKDIR /pydev
 
 # Copy files relative to workspace root
 COPY requirements.txt .
-COPY sparkjob.py .
-
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
 
 # Run Spark job
-CMD ["python", "sparkjob.py"]
+CMD ["python", "main.py"]
