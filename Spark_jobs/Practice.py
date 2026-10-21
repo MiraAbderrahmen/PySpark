@@ -1,12 +1,12 @@
-from Spark_jobs.classes.Sparksession import CreateSparkSession
 import time
-from pyspark.sql import functions as F
-create_spark_session = CreateSparkSession("Exercise 1", 8,driver_memory="4g",executor_memory="4g")
+class Practice:
+    def __init__(self, spark):
+        self.spark = spark
 
-df = create_spark_session.spark.read.csv("data/students_en.csv", header=True)
+    def run(self):
+        df = self.spark.read.csv("data/students_en.csv", header=True)
 
-# Code 3:
-start = time.time()
-df.show()
-time3 = time.time() - start
-print(f"filter() time: {time3:.2f}s")
+        start = time.time()
+        df.show()
+        elapsed = time.time() - start
+        print(f"show() time: {elapsed:.2f}s")
