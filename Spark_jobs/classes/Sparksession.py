@@ -12,6 +12,10 @@ class CreateSparkSession:
         builder = (
             SparkSession.builder
             .appName(app_name)
+             .config(
+                    "spark.jars.packages",
+                    "org.apache.spark:spark-avro_2.13:4.1.1"
+                )
             .config("spark.driver.memory", driver_memory)
             .config("spark.executor.memory", executor_memory)
         )
